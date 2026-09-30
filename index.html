@@ -1733,12 +1733,11 @@
       .id-row { padding-left: 2px; padding-right: 2px; }
       .folio-modal { padding: 8px; }
       .folio-modal-dialog { width: calc(100vw - 16px); max-height: 96svh; }
-      .folio-modal-image { max-height: calc(96svh - 206px); }
+      .folio-modal-image { max-height: calc(96svh - 140px); }
       .folio-modal-caption { min-height: 100px; grid-template-columns: auto 1fr; padding: 12px 66px 12px 14px; align-content: center; }
       .folio-modal-tip { display: block; grid-column: 1 / -1; margin-top: 2px; font-size: .68rem; white-space: normal; }
-      .folio-zoom-controls { grid-template-columns: 44px minmax(90px, 1fr) 44px 48px; gap: 8px; min-height: 66px; padding: 8px 10px; }
-      .folio-zoom-button { width: 44px; height: 44px; min-height: 44px; }
-      .folio-zoom-slider { height: 44px; }
+      /* Mobile skips the zoom button bar: the card zooms with a natural pinch instead. */
+      .folio-zoom-controls { display: none; }
       .folio-modal-close { top: 9px; right: 9px; width: 44px; height: 44px; }
     }
 
@@ -2143,9 +2142,9 @@
     </div>
   </footer>
 
-  <a class="mobile-cta" href="tel:+8801805477729" target="_blank" rel="noopener" data-track-section="sticky_call_bar" data-track-event="cta_call" data-track-label="Sticky call bar - Call Masuod" aria-label="Call Mohammad Masuod Al Hossain">
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.63a2 2 0 0 1-.45 2.11L8 9.73a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.85.29 1.73.5 2.63.62A2 2 0 0 1 22 16.92Z"/></svg>
-    Call Masuod
+  <a class="mobile-cta" href="https://wa.me/8801805477729" target="_blank" rel="noopener noreferrer" data-track-section="sticky_whatsapp_bar" data-track-event="cta_whatsapp" data-track-label="Sticky WhatsApp bar - WhatsApp Masuod" aria-label="Chat with Masuod on WhatsApp: +880 1805 477729">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+    WhatsApp Masuod
   </a>
 
   <script>
@@ -2155,8 +2154,8 @@
        * Google Tag Manager can listen with a "Custom Event" trigger (Event name =
        * one row below), then send it to GA4 with an Event tag.
        *   page_data          static page facts (site_name, page_type, advertiser)
-       *   cta_call           any call button / phone row / sticky call bar tap
-       *   cta_whatsapp       any WhatsApp button / row tap
+       *   cta_call           any call button / phone row tap
+       *   cta_whatsapp       any WhatsApp button / row / sticky bar tap
        *   cta_email          any email button / row tap
        *   nav_click          top bar + mobile menu navigation links
        *   anchor_click       other in-page section jumps
@@ -2339,6 +2338,17 @@
       var activeCard = null;
       var fittedImageWidth = 0;
 
+      /* On small screens the zoom bar is hidden by CSS; the card image zooms
+         with the same pinch gesture as a photo in a phone gallery, and the
+         hint copy switches to match. */
+      function mobileZoomBarHidden() {
+        return window.matchMedia && window.matchMedia('(max-width: 560px)').matches;
+      }
+      var folioHint = document.querySelector('.folio-hint');
+      if (mobileZoomBarHidden() && folioHint) {
+        folioHint.textContent = 'Tap any card for a close-up, then pinch to zoom.';
+      }
+
       function resetZoom() {
         modalMedia.classList.remove('is-zoomed');
         modalImageButton.style.width = '';
@@ -2348,7 +2358,7 @@
         zoomSlider.setAttribute('aria-valuetext', '100 percent');
         zoomValue.textContent = '100%';
         modalImageButton.setAttribute('aria-label', 'Zoom project card image');
-        modalTip.textContent = 'Use the zoom bar below · Esc to close';
+        modalTip.textContent = mobileZoomBarHidden() ? 'Pinch to zoom · drag to move' : 'Use the zoom bar below · Esc to close';
         modalMedia.scrollTop = 0;
         modalMedia.scrollLeft = 0;
       }
@@ -2381,7 +2391,7 @@
         modalImage.style.width = targetWidth + 'px';
         modalImage.style.maxHeight = 'none';
         modalImageButton.setAttribute('aria-label', 'Fit project card image to screen');
-        modalTip.textContent = 'Drag to read · use the zoom bar below';
+        modalTip.textContent = mobileZoomBarHidden() ? 'Drag to read · pinch to zoom' : 'Drag to read · use the zoom bar below';
 
         window.requestAnimationFrame(function () {
           if (wasZoomed) {
@@ -2478,6 +2488,92 @@
         setZoom(nextZoomIn);
         reportZoomUse(nextZoomIn);
       });
+
+      /* Mobile pinch-to-zoom (same places as the hidden zoom bar). The two-finger
+         gesture drives the same zoom state, anchoring the pinch midpoint so it
+         feels like a native photo viewer; one finger already pans natively on
+         the scrollable media area once the image is larger than the viewport. */
+      var pinchInProgress = false;
+      var pinchStartDistance = 0;
+      var pinchStartZoom = 100;
+      var pinchMoved = false;
+
+      function pinchDistance(touchOne, touchTwo) {
+        var dx = touchOne.clientX - touchTwo.clientX;
+        var dy = touchOne.clientY - touchTwo.clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      function setZoomPinch(nextZoomPercent, midClientX, midClientY) {
+        var nextZoom = Math.max(100, Math.min(300, Math.round(nextZoomPercent)));
+        var oldZoom = Number(zoomSlider.value) || 100;
+        if (nextZoom === oldZoom) return;
+        if (nextZoom === 100) {
+          resetZoom();
+          return;
+        }
+        var mediaRect = modalMedia.getBoundingClientRect();
+        var anchorOffsetX = midClientX - mediaRect.left;
+        var anchorOffsetY = midClientY - mediaRect.top;
+        var contentWidthBefore = modalMedia.scrollWidth || 1;
+        var contentHeightBefore = modalMedia.scrollHeight || 1;
+        var anchorContentX = modalMedia.scrollLeft + anchorOffsetX;
+        var anchorContentY = modalMedia.scrollTop + anchorOffsetY;
+
+        zoomSlider.value = String(nextZoom);
+        zoomSlider.setAttribute('aria-valuetext', nextZoom + ' percent');
+        zoomValue.textContent = nextZoom + '%';
+        if (!fittedImageWidth) rememberFittedWidth();
+        var targetWidth = Math.round(fittedImageWidth * nextZoom / 100);
+        modalMedia.classList.add('is-zoomed');
+        modalImageButton.style.width = Math.max(modalMedia.clientWidth, targetWidth) + 'px';
+        modalImage.style.width = targetWidth + 'px';
+        modalImage.style.maxHeight = 'none';
+        modalImageButton.setAttribute('aria-label', 'Fit project card image to screen');
+        modalTip.textContent = mobileZoomBarHidden() ? 'Drag to read · pinch to zoom' : 'Drag to read · use the zoom bar below';
+
+        window.requestAnimationFrame(function () {
+          var scaleX = (modalMedia.scrollWidth || 1) / contentWidthBefore;
+          var scaleY = (modalMedia.scrollHeight || 1) / contentHeightBefore;
+          modalMedia.scrollLeft = Math.max(0, anchorContentX * scaleX - anchorOffsetX);
+          modalMedia.scrollTop = Math.max(0, anchorContentY * scaleY - anchorOffsetY);
+        });
+      }
+
+      modalMedia.addEventListener('touchstart', function (touchStartEvent) {
+        if (modal.hidden || !mobileZoomBarHidden()) return;
+        if (touchStartEvent.touches.length === 2) {
+          pinchInProgress = true;
+          pinchMoved = false;
+          pinchStartDistance = pinchDistance(touchStartEvent.touches[0], touchStartEvent.touches[1]);
+          pinchStartZoom = Number(zoomSlider.value) || 100;
+        }
+      }, { passive: true });
+
+      modalMedia.addEventListener('touchmove', function (touchMoveEvent) {
+        if (!pinchInProgress || modal.hidden || !mobileZoomBarHidden()) return;
+        if (touchMoveEvent.touches.length !== 2) return;
+        touchMoveEvent.preventDefault(); // handle the gesture ourselves, skip browser page-zoom
+        var distanceNow = pinchDistance(touchMoveEvent.touches[0], touchMoveEvent.touches[1]);
+        if (pinchStartDistance <= 0) return;
+        setZoomPinch(
+          pinchStartZoom * distanceNow / pinchStartDistance,
+          (touchMoveEvent.touches[0].clientX + touchMoveEvent.touches[1].clientX) / 2,
+          (touchMoveEvent.touches[0].clientY + touchMoveEvent.touches[1].clientY) / 2
+        );
+        pinchMoved = true;
+      }, { passive: false });
+
+      function endPinchGesture(touchEndEvent) {
+        if (!pinchInProgress) return;
+        if (touchEndEvent.touches.length === 0) {
+          if (pinchMoved) reportZoomUse(Number(zoomSlider.value) || 100);
+          pinchInProgress = false;
+          pinchMoved = false;
+        }
+      }
+      modalMedia.addEventListener('touchend', endPinchGesture);
+      modalMedia.addEventListener('touchcancel', endPinchGesture);
       modalImage.addEventListener('load', function () {
         if (!modal.hidden && Number(zoomSlider.value) === 100) rememberFittedWidth();
       });
